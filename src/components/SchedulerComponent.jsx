@@ -1,7 +1,11 @@
 import React from "react";
 import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
 import { Typography } from "@mui/material";
-import { Scheduler } from "@aldabil/react-scheduler";
+import {
+  ProcessedEvent,
+  Scheduler,
+  SchedulerHelpers,
+} from "@aldabil/react-scheduler";
 
 const EVENTS = [
   {
@@ -11,7 +15,7 @@ const EVENTS = [
     end: new Date("2022 3 22 10:30"),
     admin_id: 2,
     course_id: 2,
-    room_id:1
+    room_id: 1,
   },
   {
     event_id: 2,
@@ -20,7 +24,7 @@ const EVENTS = [
     end: new Date("2022 3 22 11:00"),
     admin_id: 1,
     course_id: 2,
-    room_id:2,
+    room_id: 2,
   },
   {
     event_id: 3,
@@ -29,7 +33,7 @@ const EVENTS = [
     end: new Date("2022 3 22 10:00"),
     admin_id: 1,
     course_id: 1,
-    room_id:3,
+    room_id: 3,
   },
 ];
 const RESOURCES = [
@@ -72,17 +76,17 @@ const COURSES = [
 ];
 const ROOMS = [
   {
-    event_id:1,
+    event_id: 1,
     room_id: 1,
     room_name: "201",
   },
   {
-    event_id:2,
+    event_id: 2,
     room_id: 2,
     room_name: "202",
   },
   {
-    event_id:3,
+    event_id: 3,
     room_id: 3,
     room_name: "203",
   },
@@ -100,7 +104,8 @@ export default function App() {
   };
 
   const handleConfirm = async (event, action) => {
-    console.log(event,action)
+    event.event_id = event?.event_id || EVENTS.length+1;
+    console.log(event, action);
     if (action === "edit") {
       console.log(EVENTS, action);
       /** PUT event to remote DB */
@@ -118,13 +123,13 @@ export default function App() {
      * ....extra other fields depend on your custom fields/editor properties
      */
     // Simulate http request: return added/edited event
-    return new Promise((res, rej) => {
+    return await new Promise((res, rej) => {
       setTimeout(() => {
         res({
           ...event,
-          event_id: Math.random()
+          event_id: event.event_id || Math.random(),
         });
-      }, 10);
+      }, 3000);
     });
   };
 
@@ -144,6 +149,7 @@ export default function App() {
       month={null}
       fields={[
         {
+          id: "event_id",
           name: "admin_id",
           type: "select",
           options: RESOURCES.map((res) => {
@@ -178,7 +184,7 @@ export default function App() {
             };
           }),
           config: { label: "Room", required: true },
-        }
+        },
       ]}
       viewerExtraComponent={(fields, event) => {
         return (
