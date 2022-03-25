@@ -1,74 +1,93 @@
-import React, { useState, useRef } from "react";
-import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
-import { Typography } from "@mui/material";
-import { ProcessedEvent, Scheduler, SchedulerHelpers } from "@aldabil/react-scheduler";
-
+import { Scheduler } from "@aldabil/react-scheduler";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import moment from "moment";
+const data = [];
 export default function App() {
-  const [events, setEvents] = useState([
-    {
-      event_id: 1,
-      title: "Event 1",
-      start: new Date("2022 3 22 09:30"),
-      end: new Date("2022 3 22 10:30"),
-      decription: "aaa",
-    },
-    {
-      event_id: 2,
-      title: "Event 2",
-      start: new Date("2022 3 20 10:00"),
-      end: new Date("2022 3 20 11:00"),
-      decription: "event 2",
-    },
-    {
-      event_id: 3,
-      title: "Event 3",
-      start: new Date("2022 3 24 09:00"),
-      end: new Date("2022 3 24 10:00"),
-      decription: "",
-    },
-  ]);
+  const baseUrl = "http://localhost:8080/";
+  const getUrl = baseUrl + "events";
+  const postUrl = baseUrl + "addEvent";
+  const deleteUrl = baseUrl + "deleteEvent?id=";
+  const updateUrl = baseUrl + "updateEvent";
 
-  const handleConfirm = (event, action) => {
+  const [events, setEvents] = useState([]);
+  const [test, setTest] = useState(1);
+  const [currentAction, setCurrentAction] = useState("edit");
+
+  useEffect(() => {
+    axios.get(getUrl).then(function (response) {
+      setEvents((prev) => {
+        let data = [...response.data];
+        let formattedData = data.map((event) => ({
+          event_id: event.event_id,
+          title: event.title,
+          start: new Date(event.startDate),
+          end: new Date(event.endDate),
+          description: event.description,
+        }));
+        prev = [...formattedData];
+        console.log(prev);
+        return prev;
+      });
+    });
+  }, [currentAction]);
+  const handleConfirm = async (e, action) => {
     if (action === "edit") {
-      let editItemIndex = events.findIndex((item) => item.event_id === event.event_id);
+      let arr = [];
+      const editItemIndex = events.findIndex((item) => item.event_id === e.event_id);
       setEvents((prev) => {
-        prev.splice(editItemIndex, 1, event);
+        prev.splice(editItemIndex, 1, e);
+        arr = [...prev];
         console.log(prev);
         return prev;
       });
-      return events;
+      setTest(Math.random());
+      return arr;
     } else if (action === "create") {
-      const newID = events[events.length - 1].event_id + 1;
-      event.event_id = newID;
-      setEvents((prev) => {
-        prev.push(event);
-        console.log(prev);
-        return prev;
+      await axios.post(postUrl, {
+        event_id: e.event_id,
+        title: e.title,
+        startDate: `${e.start.getFullYear()} ${e.start.getMonth() + 1} ${e.start.getDate()} ${e.start.getHours()}:${e.start.getMinutes()}`,
+        endDate: `${e.end.getFullYear()} ${e.end.getMonth() + 1} ${e.end.getDate()} ${e.end.getHours()}:${e.end.getMinutes()}`,
+        description: e.description,
+        status: e.status,
       });
+      setCurrentAction(action);
       return events;
     }
   };
 
   const handleDelete = async (deletedId) => {
-    // Simulate http request: return the deleted id
-    console.log("DELETE:", deletedId);
-    // setEvents((prev) => prev.filter((event) => event.event_id != deletedId));
+    await axios.delete(deleteUrl + deletedId);
+    setCurrentAction("delete");
+    return events;
   };
 
   return (
     <Scheduler
       view="week"
-      day={null}
+      events={events}
+      day={{
+        startHour: 6,
+        endHour: 23,
+        step: 60,
+      }}
+      week={{
+        weekDays: [0, 1, 2, 3, 4, 5, 6],
+        weekStartOn: 0,
+        startHour: 6,
+        endHour: 23,
+        step: 60,
+      }}
       month={null}
       fields={[
         {
           name: "description",
           type: "input",
           default: "",
-          config: { label: "Decription", multiline: true, rows: 4 },
+          config: { label: "Description", multiline: true, rows: 4 },
         },
       ]}
-      events={events}
       onConfirm={handleConfirm}
       onDelete={handleDelete}
     />

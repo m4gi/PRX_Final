@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<tasks>
+
+    <event id="1">
+
+        <title>Event 1</title>
+
+        <start_date>2022 3 22 09:30</start_date>
+
+        <end_date>2022 3 22 10:30</end_date>
+
+        <description>Run 10km</description>
+
+        <status>Not done</status>
+
+    </event>
+
+    <event id="2">
+
+        <title>Event 2</title>
+
+        <start_date>2022 3 24 08:30</start_date>
+
+        <end_date>2022 3 24 10:30</end_date>
+
+        <description>Study</description>
+
+        <status>Not done</status>
+
+    </event>
+
+    <event id="3">
+
+        <title>Event 3</title>
+
+        <start_date>2022 3 26 08:30</start_date>
+
+        <end_date>2022 3 26 09:30</end_date>
+
+        <description>Go coffee</description>
+
+        <status>Not done</status>
+
+    </event>
+
+    <event id="4">
+
+        <title>Event 4</title>
+
+        <start_date>2022 3 23 14:30</start_date>
+
+        <end_date>2022 3 23 15:30</end_date>
+
+        <description>Cycle 10km</description>
+
+        <status>Not done</status>
+
+    </event>
+
+    <event id="5">
+
+        <title>Event 5</title>
+
+        <start_date>2022 3 25 16:30</start_date>
+
+        <end_date>2022 3 25 17:30</end_date>
+
+        <description>Swim 10km</description>
+
+        <status>Not done</status>
+
+    </event>
+
+</tasks>
