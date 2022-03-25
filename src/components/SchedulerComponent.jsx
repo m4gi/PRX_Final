@@ -8,7 +8,7 @@ export default function App() {
   const getUrl = baseUrl + "events";
   const postUrl = baseUrl + "addEvent";
   const deleteUrl = baseUrl + "deleteEvent?id=";
-  const updateUrl = baseUrl + "updateEvent";
+  const putUrl = baseUrl + "updateEvent";
 
   const [events, setEvents] = useState([]);
   const [test, setTest] = useState(1);
@@ -33,19 +33,20 @@ export default function App() {
   }, [currentAction]);
   const handleConfirm = async (e, action) => {
     if (action === "edit") {
-      let arr = [];
-      const editItemIndex = events.findIndex((item) => item.event_id === e.event_id);
-      setEvents((prev) => {
-        prev.splice(editItemIndex, 1, e);
-        arr = [...prev];
-        console.log(prev);
-        return prev;
+      await axios.put(putUrl, {
+        event_id: e.event_id,
+        title: e.title,
+        startDate: `${e.start.getFullYear()} ${e.start.getMonth() + 1} ${e.start.getDate()} ${e.start.getHours()}:${e.start.getMinutes()}`,
+        endDate: `${e.end.getFullYear()} ${e.end.getMonth() + 1} ${e.end.getDate()} ${e.end.getHours()}:${e.end.getMinutes()}`,
+        description: e.description,
+        status: e.status,
       });
       setTest(Math.random());
-      return arr;
+      setCurrentAction(action);
+      return events;
     } else if (action === "create") {
       await axios.post(postUrl, {
-        event_id: e.event_id,
+        event_id: null,
         title: e.title,
         startDate: `${e.start.getFullYear()} ${e.start.getMonth() + 1} ${e.start.getDate()} ${e.start.getHours()}:${e.start.getMinutes()}`,
         endDate: `${e.end.getFullYear()} ${e.end.getMonth() + 1} ${e.end.getDate()} ${e.end.getHours()}:${e.end.getMinutes()}`,
