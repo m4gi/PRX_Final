@@ -11,7 +11,6 @@ export default function App() {
   const putUrl = baseUrl + "updateEvent";
 
   const [events, setEvents] = useState([]);
-  const [test, setTest] = useState(1);
   const [currentAction, setCurrentAction] = useState("edit");
 
   useEffect(() => {
@@ -24,6 +23,7 @@ export default function App() {
           start: new Date(event.startDate),
           end: new Date(event.endDate),
           description: event.description,
+          status: event.status === "Done" ? 1 : 2,
         }));
         prev = [...formattedData];
         console.log(prev);
@@ -39,10 +39,24 @@ export default function App() {
         startDate: `${e.start.getFullYear()} ${e.start.getMonth() + 1} ${e.start.getDate()} ${e.start.getHours()}:${e.start.getMinutes()}`,
         endDate: `${e.end.getFullYear()} ${e.end.getMonth() + 1} ${e.end.getDate()} ${e.end.getHours()}:${e.end.getMinutes()}`,
         description: e.description,
-        status: e.status,
+        status: e.status === 1 ? "Done" : "Not done",
       });
-      setTest(Math.random());
-      setCurrentAction(action);
+      axios.get(getUrl).then(function (response) {
+        setEvents((prev) => {
+          let data = [...response.data];
+          let formattedData = data.map((event) => ({
+            event_id: event.event_id,
+            title: event.title,
+            start: new Date(event.startDate),
+            end: new Date(event.endDate),
+            description: event.description,
+            status: event.status === "Done" ? 1 : 2,
+          }));
+          prev = [...formattedData];
+          console.log(prev);
+          return prev;
+        });
+      });
       return events;
     } else if (action === "create") {
       await axios.post(postUrl, {
@@ -51,7 +65,7 @@ export default function App() {
         startDate: `${e.start.getFullYear()} ${e.start.getMonth() + 1} ${e.start.getDate()} ${e.start.getHours()}:${e.start.getMinutes()}`,
         endDate: `${e.end.getFullYear()} ${e.end.getMonth() + 1} ${e.end.getDate()} ${e.end.getHours()}:${e.end.getMinutes()}`,
         description: e.description,
-        status: e.status,
+        status: e.status === 1 ? "Done" : "Not done",
       });
       setCurrentAction(action);
       return events;
@@ -88,9 +102,37 @@ export default function App() {
           default: "",
           config: { label: "Description", multiline: true, rows: 4 },
         },
+        {
+          name: "status",
+          type: "select",
+          default: 2,
+          options: [
+            { id: 1, text: "Done", value: 1 },
+            { id: 2, text: "Not done", value: 2 },
+          ],
+          config: { label: "Status" },
+        },
       ]}
       onConfirm={handleConfirm}
       onDelete={handleDelete}
+      // resources={[
+      //   {
+      //     assignee: 1,
+      //     text: "User One",
+      //     avatar: "https://i.pravatar.cc/300",
+      //     color: "#ab2d2d",
+      //   },
+      // ]}
+      viewerExtraComponent={(fields, event) => {
+        return (
+          <div>
+            <p>
+              Status: <b style={event.status === 1 ? { color: "green" } : { color: "red" }}>{event.status === 1 ? "Done" : "Not done"}</b>
+            </p>
+            <p>Description: {event.description || "Nothing..."}</p>
+          </div>
+        );
+      }}
     />
   );
 }
